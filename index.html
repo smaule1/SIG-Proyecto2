@@ -8,6 +8,8 @@
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
         integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
     <script src="cantones_tumores_var.js" type="text/javascript"></script>
+    <script src="./Clinicas/clinicas_selec_ganglio_var.js" type="text/javascript"></script>
+    <script src="./Hospitales/hospitales_selec_ganglios_var.js" type="text/javascript"></script>
     <link rel="stylesheet" href="style.css">
 
 </header>
@@ -118,6 +120,33 @@
 
 
         geojson = L.geoJson(data, { style: style, onEachFeature: onEachFeature}).addTo(map);
+
+        function hospitalMarker(geoJsonPoint, latlng){
+            var icon = L.icon({                 
+                iconUrl: "./Hospitales/hospital_icon.png",                
+                iconSize: [40,40],
+                iconAnchor:   [20, 40],                
+            });
+            
+            return L.marker(latlng, {icon: icon, title: geoJsonPoint.properties.NOMBRE, riseOnHover: true});
+        }
+
+         function clinicaMarker(geoJsonPoint, latlng){
+            var icon = L.icon({                 
+                iconUrl: "./Clinicas/clinica_icon.png",                
+                iconSize: [40,40],
+                iconAnchor:   [20, 40],                
+            });
+            
+            return L.marker(latlng, {icon: icon, title: geoJsonPoint.properties.NOMBRE, riseOnHover: true});
+        }
+
+        L.geoJson(clinicasGanglios, {pointToLayer: clinicaMarker}).addTo(map);
+        L.geoJson(hospitalesGanglios, {pointToLayer: hospitalMarker}).addTo(map);
+        
+
+
+
     </script>
 </body>
 
