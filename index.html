@@ -1,0 +1,124 @@
+<html>
+<header>
+
+
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+        integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
+    <!-- Make sure you put this AFTER Leaflet's CSS -->
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+        integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+    <script src="cantones_tumores_var.js" type="text/javascript"></script>
+    <link rel="stylesheet" href="style.css">
+
+</header>
+
+<body>
+    <div id="map" style="height:100%; width:100%;"></div>
+
+
+    <script>
+        var map = L.map('map').setView([9.928, -84.026], 8);
+        var geojson;
+
+        // L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        //     maxZoom: 19,            
+        //     attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+        // }).addTo(map);    
+        
+        // ======== STYLING ========
+
+        function getColor(num) {
+            return  num > 25 ? '#a63603' :
+                    num > 20 ? '#e6550d' :
+                    num > 15 ? '#fd8d3c' :
+                    num > 10 ? '#fdae6b' :
+                    num > 5 ? '#fdd0a2' :
+                    '#feedde';
+        }
+
+        function style(feature) {
+            return {
+                fillColor: getColor(feature.properties.GANGLIOS_TASA),
+                fillOpacity: 1,
+                opacity: 1,
+                color: 'black',
+                weight: 1,
+            }
+        }     
+
+        // ======== CONTROLS ========
+
+        var info = L.control();
+
+        info.onAdd = function (map) {
+            this._div = L.DomUtil.create('div', 'info');
+            this.update();
+            return this._div;
+        };
+
+        info.update = function (props) {
+            this._div.innerHTML = '<h4>Tasa de Cáncer de Ganglios</h4>' +  (props ?
+                '<b>' + props.NCANTON + '</b><br />' + props.GANGLIOS_TASA + ' por 100 000 habitantes'
+                : 'Coloque el cursor sobre un cantón');
+        };
+
+        info.addTo(map);
+
+        // ======== INTERACTIONS ========
+
+        function highlightFeature(e) {
+            var layer = e.target;
+
+            layer.setStyle({
+                weight: 4,
+                color: '#007',
+                dashArray: '',
+                fillOpacity: 1,
+            });
+
+            layer.bringToFront();
+            info.update(layer.feature.properties)
+        }        
+
+        function resetHighlight(e) {
+            geojson.resetStyle(e.target);
+            info.update;
+        }
+
+        function zoomToFeature(e) {
+            map.fitBounds(e.target.getBounds());
+        }
+
+        function onEachFeature(feature, layer) {
+        layer.on({
+            mouseover: highlightFeature,
+            mouseout: resetHighlight,
+                click: zoomToFeature,
+            })
+        }
+
+        var legend = L.control({position: 'bottomright'});
+        legend.onAdd = function (map) {
+
+            var div = L.DomUtil.create('div', 'info legend'),
+                grades = [0, 5, 10, 15, 20, 25],
+                labels = [];
+
+            // loop through our density intervals and generate a label with a colored square for each interval
+            for (var i = 0; i < grades.length; i++) {
+                div.innerHTML +=
+                    '<i style="background:' + getColor(grades[i] + 1) + '"></i> ' +
+                    grades[i] + (grades[i + 1] ? '&ndash;' + grades[i + 1] + '<br>' : '+');
+            }
+
+            return div;
+        };
+
+        legend.addTo(map);
+
+
+        geojson = L.geoJson(data, { style: style, onEachFeature: onEachFeature}).addTo(map);
+    </script>
+</body>
+
+</html>
