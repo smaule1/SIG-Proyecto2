@@ -27,11 +27,58 @@
         .layer-selector label {
             font-size: 13px;
         }
+        .descripcion-ganglios {
+            position: absolute;
+            bottom: 20px;
+            left: 20px;
+            max-width: 360px;
+            background: rgba(255,255,255,0.95);
+            padding: 12px 16px;
+            border-radius: 6px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.25);
+            font-size: 14px;
+            line-height: 1.4;
+        }
+        .descripcion-ganglios h3 {
+            margin: 0 0 6px 0;
+            font-size: 15px;
+        }
+        .descripcion-pulmon {
+            position: absolute;
+            bottom: 20px;
+            left: 20px;
+            max-width: 360px;
+            background: rgba(255,255,255,0.95);
+            padding: 12px 16px;
+            border-radius: 6px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.25);
+            font-size: 14px;
+            line-height: 1.4;
+        }
+        .descripcion-pulmon h3 {
+            margin: 0 0 6px 0;
+            font-size: 15px;
+        }
     </style>
 </header>
 
 <body>
     <div id="map" style="height:100vh; width:100%;"></div>
+    <div id="descripcion-ganglios" class="descripcion-ganglios">
+        <h3>Distribución del cáncer de ganglios</h3>
+        <p>El cáncer de ganglios presenta una concentración marcada en la región sur del país, especialmente en cantones como Osa y zonas aledañas, donde se observan los valores más altos de incidencia (categorías superiores a 25 por cada 100 000 habitantes).</p>
+        <p>También se identifican focos relevantes en la GAM y en partes del Pacífico central.</p>
+        <p>En estas zonas sí existe una presencia visible de clínicas y hospitales seleccionados, aunque no necesariamente proporcional a la magnitud de los valores observados.</p>
+        <p>Particularmente en la región sur, donde aparecen los valores más altos, la cantidad de centros disponibles es reducida en comparación con la extensión del territorio y la intensidad de los casos.</p>
+        <p>Este patrón sugiere que el cáncer de ganglios muestra una variabilidad territorial significativa, con zonas de riesgo claramente delimitadas.</p>
+    </div>
+    <div id="descripcion-pulmon" class="descripcion-pulmon" style="display: none;">
+        <h3>Distribución del cáncer de pulmón</h3>
+        <p>El cáncer de pulmón muestra un patrón territorial particular: aunque no existen picos extremos como sucede con el cáncer de ganglios, la mayor parte de los cantones con tasas más elevadas se concentran en la región de Guanacaste y en áreas del Pacífico Norte. Esta zona exhibe valores que se mantienen de forma consistente en rangos medios (10–20 por 100 000 habitantes), lo cual sugiere una presencia sostenida y relevante del tumor en el territorio.</p>
+        <p>Sin embargo, al comparar esta distribución con la infraestructura sanitaria disponible, se evidencia una brecha significativa. Para el cáncer de pulmón, el mapa únicamente muestra clínicas, y en número muy reducido.</p>
+        <p>No existe ningún hospital ubicado dentro de los cantones con mayor incidencia, ni en la región en general. Esto significa que Guanacaste carece de centros hospitalarios en el dataset que puedan ofrecer atención más especializada.</p>
+        <p>En conjunto, este contraste revela que los cantones donde el cáncer de pulmón aparece con mayor frecuencia son precisamente los que cuentan con menos recursos de salud disponibles, lo cual puede limitar la detección temprana, el acceso a servicios especializados y la continuidad del tratamiento para este tipo de tumor.</p>
+    </div>
 
     <script>
         // =====================================================================
@@ -268,6 +315,22 @@
         };
         layerSelector.addTo(map);
 
+        function updateDescripcionGanglios() {
+            var descripcion = document.getElementById('descripcion-ganglios');
+            if (!descripcion) {
+                return;
+            }
+            descripcion.style.display = (currentTipo === 'ganglios') ? 'block' : 'none';
+        }
+
+        function updateDescripcionPulmon() {
+            var descripcion = document.getElementById('descripcion-pulmon');
+            if (!descripcion) {
+                return;
+            }
+            descripcion.style.display = (currentTipo === 'pulmon') ? 'block' : 'none';
+        }
+
         function switchLayer(tipo) {
             currentTipo = tipo;
 
@@ -299,6 +362,8 @@
             }
 
             info.update();
+            updateDescripcionGanglios();
+            updateDescripcionPulmon();
         }
 
         document.addEventListener('change', function(e) {
@@ -306,6 +371,9 @@
                 switchLayer(e.target.value);
             }
         });
+
+        updateDescripcionGanglios();
+        updateDescripcionPulmon();
     </script>
 </body>
 </html>
